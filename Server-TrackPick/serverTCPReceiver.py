@@ -1,21 +1,26 @@
-import cherrypy;
-import socketserver;
-import socket;
-import io;
+import socketserver
 
+class MyTCPHandler(socketserver.BaseRequestHandler):
+    """
+The request handler class for server.
+Instantiated once per connection to the server, and must
+override the handle() method to implement communication to the
+client.
+"""
 
-TCP_IP = '127.0.0.1'
-TCP_PORT = 4444
-BUFFER_SIZE = 20  # For the fast response
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(1)
+    def handle(self):
+        # self.request is the TCP socket connected to the client
+        self.data = self.request.recv(1024).strip()
+        print("{} wrote:".format(self.client_address[0]))
+        print(self.data)
+        # just send back the same data, but upper-cased
+        self.request.sendall(self.data.upper())
 
-conn, addr = s.accept()
-print('Connection address:', addr);
-while 1:
-    data = conn.recv(BUFFER_SIZE)
-    if not data: break
-    print( "received data:", data);
-    conn.send(data)  # echo for showing the data received.
-conn.close()
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+
+    # Create the server, binding to localhost on port 9999
+    server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
+
+    # Activate the server
+    server.serve_forever()

@@ -1,20 +1,20 @@
-import random
-import string
+import socket
+import sys
 
-import cherrypy
+HOST, PORT = "localhost", 9999
+data = " ".join(sys.argv[1:])
 
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a socket (SOCK_STREAM as TCP socket)
 
-class Generator(object):
-    @cherrypy.expose
-    def index(self):
-        return "Hello world!"
+try:
+    # Connect to server and send data
+    sock.connect((HOST, PORT))
+    sock.sendall(bytes(data + "\n", "utf-8"))
 
-    @cherrypy.expose
-    def generate(self):
-        return ''.join(random.sample(string.hexdigits, 8))
-		
+    # Receive data from the server and shut down
+    received = str(sock.recv(1024), "utf-8")
+finally:
+    sock.close()
 
-
-
-if __name__ == '__main__':
-    cherrypy.quickstart(Generator())
+print("Sent:     {}".format(data))
+print("Received: {}".format(received))
