@@ -4,7 +4,9 @@ import sys
 HOST, PORT = "localhost", 9999
 data = " ".join(sys.argv[1:])
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a socket (SOCK_STREAM as TCP socket)
+# Create a socket (SOCK_STREAM as TCP socket)
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     # Connect to server and send data
