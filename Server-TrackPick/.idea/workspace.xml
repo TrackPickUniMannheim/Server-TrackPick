@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be7acd41-3e0c-406e-a4b3-7802ea655f5e" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DispatchHandler.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/serverTCPReceiver.py" afterPath="$PROJECT_DIR$/serverTCPReceiver.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server_request.py" afterPath="$PROJECT_DIR$/server_request.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,14 +19,24 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="serverTCPReceiver.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="serverTCPReceiver.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/serverTCPReceiver.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
-              <caret line="19" column="61" lean-forward="false" selection-start-line="19" selection-start-column="61" selection-end-line="19" selection-end-column="61" />
+              <caret line="19" column="66" lean-forward="false" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DispatchHandler.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/DispatchHandler.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="19" lean-forward="true" selection-start-line="0" selection-start-column="19" selection-end-line="0" selection-end-column="19" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -60,6 +70,7 @@
       <list>
         <option value="$PROJECT_DIR$/server_request.py" />
         <option value="$PROJECT_DIR$/serverTCPReceiver.py" />
+        <option value="$PROJECT_DIR$/DispatchHandler.py" />
       </list>
     </option>
   </component>
@@ -484,10 +495,18 @@
     <entry file="file://$PROJECT_DIR$/serverTCPReceiver.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
-          <caret line="19" column="61" lean-forward="false" selection-start-line="19" selection-start-column="61" selection-end-line="19" selection-end-column="61" />
+          <caret line="19" column="66" lean-forward="false" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DispatchHandler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="19" lean-forward="true" selection-start-line="0" selection-start-column="19" selection-end-line="0" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
