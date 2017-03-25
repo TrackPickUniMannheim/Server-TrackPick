@@ -7,7 +7,7 @@ The request handler class for server.
 Instantiated once per connection to the server, and must override the handle() method to implement communication to the client.
 """
 
-while(1):
+while(True):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
