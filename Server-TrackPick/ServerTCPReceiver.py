@@ -1,22 +1,28 @@
-import socketserver
-class MyTCPHandler(socketserver.StreamRequestHandler):
-    
-    def handle(self):
-        # self.rfile is a file-like object created by the handler;
-        # we can now use e.g. readline() instead of raw recv() calls
-        self.data = self.rfile.readline().strip()
-        print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
-        # Likewise, self.wfile is a file-like object used to write back
-        # to the client
-        self.wfile.write(self.data.upper())
+from socketserver import ThreadingMixIn,ForkingMixIn,StreamRequestHandler
+import socket,select
 
-
-if __name__ == "__main__":
-    HOST, PORT = "localhost", 9999
-    
-    # Create the server, binding to localhost on port 9999
-    server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
-    
-    # Activate the server
-    server.serve_forever()
+s = socket.socket()
+#host = socket.gethostname()
+host = '127.0.0.1'
+print(host)
+port = 9999
+s.bind((host,port))
+s.listen(5)
+inputs = [s]
+while True:
+    rs,ws,es = select.select(inputs,[],[])
+    for r in rs:
+        if r is s:
+            c,addr = s.accept()
+            inputs.append(c)
+            print(addr)
+        else:
+            try:
+                data = r.recv(1024)
+                disconnected = not data
+            except:
+                disconnected = True
+            if disconnected:
+                inputs.remove(r)
+            else:
+                print(data)
