@@ -26,7 +26,7 @@ class ReadDocument(object): # Crud for reading data from (i.e Test database)
     from pymongo import MongoClient
     read = MongoClient()
     read = MongoClient('localhost',27017)
-    dbread = read.get_database('test_database')
+    dbread = read.get_database(' ')
     print(dbread.document)
 
 
