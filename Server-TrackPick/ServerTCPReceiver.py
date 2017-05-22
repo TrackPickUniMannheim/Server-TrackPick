@@ -37,6 +37,7 @@ class ClientThread(threading.Thread): # Class that implements the client threads
             else:
                 arrivetime = int(round(time.time() * 1000)) #Arrival time taken on each thread and concatinated with the data
                 data = str(data) + "Arrival Time" + str(arrivetime)
+                #data = data.encode('utf-8')
                 print(data) # Main data for Incoming Data
                 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # connect via pika with localhost
                 channel = connection.channel() # connect channel through connection
