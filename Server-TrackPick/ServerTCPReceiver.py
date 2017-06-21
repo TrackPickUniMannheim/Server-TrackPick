@@ -3,6 +3,9 @@ import socket
 import threading
 import time
 import pika
+import subprocess
+
+#@Developers: Niranjan Basnet, Zuli Wu
 
 QUIT = False
 
@@ -21,37 +24,39 @@ class ClientThread(threading.Thread): # Class that implements the client threads
         done = False
         data = self.readline() # Read data from the socket and process it
 
-        if data is 'b%':
+        if data is "b''%":
             self.writeline("No data thus quitting")
             QUIT = True
             done = True
 
         while not done:
-            #if 'quit' == data:
-                #self.writeline('Quitting...')
-                #QUIT = True
-                #done = True
+
             # Case where data was received
             if data is None:
                 self.client.close()
             else:
-                arrivetime = int(round(time.time() * 1000)) #Arrival time taken on each thread and concatinated with the data
-                data = str(data) + "Arrival Time" + str(arrivetime)
-                #data = data.encode('utf-8')
-                print(data) # Main data for Incoming Data
+                servertime = int(round(time.time() * 1000))  # Arrival time taken on each
+                                                                # thread and concatinated with the data
+                # Wrapping with external JSON for server time
+                data = data.decode('utf-8')
+                outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
+                print(outdata)
                 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # connect via pika with localhost
-                channel = connection.channel() # connect channel through connection
+                channel = connection.channel() # Connect channel through connection
 
                 channel.queue_declare(queue='trackPick') # Queue declaration with "trackPick"
                 channel.basic_publish(exchange='',
                                       routing_key='trackPick',  # Routing with key "trackPick"
-                                      body=data)
+                                      body=outdata)
+
+                print("Sending to queue...")
 
                 if data is None:
                     QUIT = True
                     done = True
 
-                print("Still Sending data...")
+
+                print("Server not yet closed...")
                 connection.close()
 
 
@@ -108,7 +113,8 @@ class Server:
                 break
             except socket.error: # Handling Binding Error
 
-                print('Socket connection error... Waiting 5 seconds to retry.') # Short 5 seconds time for socket replinishment
+                print('Socket connection error... Waiting 5 seconds to retry.') # Short 5 seconds
+                                                                                # time for socket replinishment
 
                 del self.sock
                 time.sleep(5)
