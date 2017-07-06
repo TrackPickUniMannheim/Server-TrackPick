@@ -39,9 +39,11 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                                                                 # thread and concatinated with the data
                 # Wrapping with external JSON for server time
                 data = data.decode('utf-8')
+                for d in data.split("\n"):
+                    data = d
                 outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
                 print(outdata)
-                connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # connect via pika with localhost
+                connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # Connect via pika with localhost
                 channel = connection.channel() # Connect channel through connection
 
                 channel.queue_declare(queue='trackPick') # Queue declaration with "trackPick"
@@ -67,7 +69,7 @@ class ClientThread(threading.Thread): # Class that implements the client threads
     def readline(self):
 
             # Helper function, reads up to 1024 chars from the socket, and returns
-            # them as a string (lowercase)
+            # them as a lowercase string (to make string uniform for all types)
 
         result = self.client.recv(1024)
         if (None != result):
@@ -92,7 +94,7 @@ class Server:
     def run(self):
 
             # Server main loop that creates the server (incoming) socket, and listens on it of incoming
-            # connections. Once an incomming connection is detected, creates a
+            # connections. Once an incoming connection is detected, creates a
             # "ClientThread" to handle it, and goes back to listening mode.
 
         all_good = False
@@ -106,9 +108,9 @@ class Server:
             try:
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create the socket
 
-                self.sock.bind(('127.0.0.1', 9999)) # Bind it to the interface and port we want to listen on
+                self.sock.bind(('0.0.0.0', 9999)) # Bind it to the interface and port we want to listen on
 
-                self.sock.listen(5) # Listening to 5 Simultanous connection
+                self.sock.listen(5) # Listening to 5 Simultaneous connection
                 all_good = True
                 break
             except socket.error: # Handling Binding Error

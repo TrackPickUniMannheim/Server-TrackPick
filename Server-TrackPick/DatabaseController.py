@@ -21,22 +21,23 @@ try:
 
     if collection is not None: # See whether the instance of database is created or not
 
-        print('Database Instance Present')
+        print('Connecting with Database...')
 
     db.create_collection(collname)
     getcoll = db.get_collection(collname)
     getcoll = str(getcoll)
     getcoll = getcoll[129:-2]
     if getcoll == collname: # See whether collection is created or not
-        print('Collection with name '+ collname + 'successfully created')
+        print("Collection with name "+ collname + "successfully created")
     else:
-        print('Collection not created')
+        print("Collection not created")
 except:
-    print('Database not found')
+    print("Database not found...Please start the MongoDB and try again...") # Checks exception for no database
+    exit()
 
 #Start with connection with queue and fetch the data
 
-print ('Fetching data and inserting into database...')
+print ("Fetching data and inserting into database...")
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # Connection with the designated queue
 channel = connection.channel()
@@ -48,13 +49,33 @@ def callback(ch, method, properties, indata):
         print("No data in the queue")
     else:
         indata = indata.decode('utf-8')
-        db.get_collection(name=getcoll).insert_one(
+
+        count = 0
+        db.get_collection(name=getcoll).insert_one( #Database instance finaldata as "Key"
+                                                    # [indata] as "Value" as documents
             {
-                "finaldata":[indata]
+
+                "finaldata" : [indata]
 
            }
         )
-        print("Insertion Complete...")
+#exit()
+#dbread = db.get_collection('getcoll').count()
+        #doccount = dbread.document
+        #print(doccount.count)
+#print(str(db.get_collection(getcoll)))
+        #count = count + 1
+        #count = str(count)
+
+    #print(count + "Insertions complete")
+#print(db.getcoll.count())
+
+
+
+
+#results = db.datasets.find({"test_database":getcoll})
+#results_count = results.count(True)
+#print(results_count
 
 channel.basic_consume(callback, queue='trackPick')
 
@@ -64,9 +85,6 @@ channel.queue_declare(exclusive=True)
 channel.start_consuming()
 
 
-
-#Start fetching the data from the queue
-#print(channel)
 
 connection.close()
 
