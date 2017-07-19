@@ -19,52 +19,55 @@ class ClientThread(threading.Thread): # Class that implements the client threads
 
     def run(self): #Thread's main loop where this function returns and the thread is finished and terminated
 
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # Connect via pika with localhost
 
         global QUIT # Declare QUIT as global, and method can change it
         done = False
         data = self.readline() # Read data from the socket and process it
-
-        if data is "b''%":
-            self.writeline("No data thus quitting")
-            QUIT = True
-            done = True
-
-        while not done:
-
-            # Case where data was received
-            if data is None:
-                self.client.close()
-            else:
-                servertime = int(round(time.time() * 1000))  # Arrival time taken on each
-                                                                # thread and concatinated with the data
-                # Wrapping with external JSON for server time
+        if data is None:
+            exit()
+        else:
+            while not done:
                 data = data.decode('utf-8')
-                for d in data.split("\n"):
-                    data = d
-                outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
-                print(outdata)
-                connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost')) # Connect via pika with localhost
-                channel = connection.channel() # Connect channel through connection
-
-                channel.queue_declare(queue='trackPick') # Queue declaration with "trackPick"
-                channel.basic_publish(exchange='',
-                                      routing_key='trackPick',  # Routing with key "trackPick"
-                                      body=outdata)
-
-                print("Sending to queue...")
-
-                if data is None:
-                    QUIT = True
+                # Case where data was received
+                if data == "disconnect": # Check whether stream should be stopped or not
                     done = True
+                    self.client.close()
+                    connection.close()
+                    return
+                elif data.strip() == '': # Check for whitespaces in the incoming streams
+                    self.client.close()
+                    connection.close()
+                    exit()
+                    return
+                elif data == "connect" or data is not None: # Initiates regardless with connect message or available data.
+                                                            # Main loop for data streaming income
+
+                    servertime = int(round(time.time() * 1000))  # Arrival time taken on each
+                                                                    # thread and concatinated with the data
+                    # Wrapping with external JSON for server time
+
+                    for d in data.split("\n"): # For line wise data in incoming streams
+                        data = d
+                    outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
+                    #print(outdata)
+                    print(outdata)
+                    #connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+                    channel = connection.channel() # Connect channel through connection
+
+                    channel.queue_declare(queue='trackPick') # Queue declaration with "trackPick"
+                    channel.basic_publish(exchange='',
+                                          routing_key='trackPick',  # Routing with key "trackPick"
+                                          body=data)
+
+                    print("Sending Data to queue...")
 
 
-                print("Server not yet closed...")
-                connection.close()
+                    #connection.close()
 
+                    data = self.readline()
 
-                data = self.readline()
-        self.client.close()
-        return
+            return
 
     def readline(self):
 
@@ -146,8 +149,8 @@ class Server:
                 # connection and data
 
                 new_thread = ClientThread(client)
-                print('Incoming Connection. Started thread ', ) # Current thread information
-                print(new_thread.getName())
+                #print('Incoming Connection. Started thread ', ) # Current thread information
+                #print(new_thread.getName())
                 self.thread_list.append(new_thread)
                 new_thread.start()
 

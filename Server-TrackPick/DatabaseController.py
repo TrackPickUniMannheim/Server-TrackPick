@@ -50,7 +50,7 @@ def callback(ch, method, properties, indata):
     else:
         indata = indata.decode('utf-8')
 
-        count = 0
+        #count = 0
         db.get_collection(name=getcoll).insert_one( #Database instance finaldata as "Key"
                                                     # [indata] as "Value" as documents
             {
