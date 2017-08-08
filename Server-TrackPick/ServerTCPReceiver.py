@@ -25,7 +25,10 @@ class ClientThread(threading.Thread): # Class that implements the client threads
         done = False
         data = self.readline() # Read data from the socket and process it
         if data is None:
-            exit()
+            #exit()
+            sys.exit()
+
+
         else:
             while not done:
                 data = data.decode('utf-8')
@@ -38,7 +41,8 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                 elif data.strip() == '': # Check for whitespaces in the incoming streams
                     self.client.close()
                     connection.close()
-                    exit()
+                    #exit()
+                    sys.exit()
                     return
                 elif data == "connect" or data is not None: # Initiates regardless with connect message or available data.
                                                             # Main loop for data streaming income
