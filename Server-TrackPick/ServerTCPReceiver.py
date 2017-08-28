@@ -53,7 +53,8 @@ class ClientThread(threading.Thread): # Class that implements the client threads
 
                     for d in data.split("\n"): # For line wise data in incoming streams
                         data = d
-                    outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
+                    outdata = '{"servertime":' + str(servertime)+'}'+ str(data)
+                    #outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":[' + str(data) + ']}'
                     #print(outdata)
                     print(outdata)
                     #connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))

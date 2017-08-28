@@ -59,23 +59,7 @@ def callback(ch, method, properties, indata):
 
            }
         )
-#exit()
-#dbread = db.get_collection('getcoll').count()
-        #doccount = dbread.document
-        #print(doccount.count)
-#print(str(db.get_collection(getcoll)))
-        #count = count + 1
-        #count = str(count)
 
-    #print(count + "Insertions complete")
-#print(db.getcoll.count())
-
-
-
-
-#results = db.datasets.find({"test_database":getcoll})
-#results_count = results.count(True)
-#print(results_count
 
 channel.basic_consume(callback, queue='trackPick')
 
