@@ -1,6 +1,3 @@
-
-__version__ = "0.1"
- 
 import os
 import posixpath
 import http.server
@@ -12,37 +9,30 @@ import re
 from io import BytesIO
  
  
-class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
- 
-    """Simple HTTP request handler with GET/HEAD/POST commands.
+class RequestHandler(http.server.BaseHTTPRequestHandler):
+
+    """
 
     This serves files from the current directory and any of its
     subdirectories.  The MIME type for files is determined by
-    calling the .guess_type() method. And can reveive file uploaded
+    calling the .guess_type() method. And can receive file uploaded
     by client.
 
-    The GET/HEAD/POST requests are identical except that the HEAD
-    request omits the actual contents of the file.
 
     """
  
-    server_version = "SimpleHTTPWithUpload/" + __version__
- 
-    def do_GET(self):
-        """Serve a GET request."""
+    def do_GET(self): # For GET Requests
         f = self.send_head()
         if f:
             self.copyfile(f, self.wfile)
             f.close()
  
-    def do_HEAD(self):
-        """Serve a HEAD request."""
+    def do_HEAD(self): #For HEAD Requests
         f = self.send_head()
         if f:
             f.close()
  
-    def do_POST(self):
-        """Serve a POST request."""
+    def do_POST(self): # For POST Requests
         r, info = self.deal_post_data()
         print((r, info, "by: ", self.client_address))
         f = BytesIO()
@@ -273,9 +263,9 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         })
  
  
-def test(HandlerClass = SimpleHTTPRequestHandler,
+def executeUpload(HandlerClass = RequestHandler,
          ServerClass = http.server.HTTPServer):
     http.server.test(HandlerClass, ServerClass)
  
 if __name__ == '__main__':
-    test()
+    executeUpload()
