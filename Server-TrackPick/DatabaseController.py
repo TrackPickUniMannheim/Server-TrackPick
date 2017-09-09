@@ -1,6 +1,7 @@
 import pika
 import sys
 import time
+import json
 
 #@Developers: Niranjan Basnet, Zuli Wu
 
@@ -35,7 +36,6 @@ except:
     print("Database not found...Please start the MongoDB and try again...") # Checks exception for no database
     exit()
 
-#Start with connection with queue and fetch the data
 
 print ("Fetching data and inserting into database...")
 
@@ -48,17 +48,67 @@ def callback(ch, method, properties, indata):
     if indata is None:
         print("No data in the queue")
     else:
+
         indata = indata.decode('utf-8')
+        #Dequeue from incoming data stream here
+        try:
+            data = json.loads(indata)
+            #print('*********************************')
+            #print('*********************************')
+            #print('*********************************')
+            #print('*********************************')
+            ##print('*********************************')
+            #print('*********************************')
+            #print('This is Original data')
+            print(data)
+            #print('*********************************')
+            #print('*********************************')
+            #print('THis is string data')
+            #print('*********************************')
+            #print('*********************************')
+            #data = str(data)
+            tdata = '"'+str(data)+'"'
+            print(tdata)
+            predata = tdata.split("'")
+            print(predata)
+            #print('*********************************')
+            #print('*********************************')
+            #print('THIS IS SINGELTON DATA')
+            #print(predata[3]) #servertime
+            #print('------------------------------------------------------------------------------------')
+            #print(predata[11]) #timestamp
+            #print('------------------------------------------------------------------------------------')
+            #print(predata[15]) #z
+            #print('------------------------------------------------------------------------------------')
+            #print(predata[19]) #x
+            ##print('------------------------------------------------------------------------------------')
+            #print(predata[23]) #y
+            #print('------------------------------------------------------------------------------------')
+            #print(predata[27]) #Device id   '"sensortype":'+'"'+predata[31]+'",'+
+            #print('------------------------------------------------------------------------------------')
+            #print(predata[31]) #sensor type
+            #print('*********************************')
 
-        #count = 0
-        db.get_collection(name=getcoll).insert_one( #Database instance finaldata as "Key"
-                                                    # [indata] as "Value" as documents
-            {
+            # Data Transformation
 
-                "finaldata" : [indata]
+            insertData = '{"servertime":'+'"'+predata[3]+'",'+ '"sensortype":'+'"'+predata[31]+'",'+'"clienttime":'+'"'+predata[11]+'",'+'"x":'+'"'+predata[31]+'",'+'"y":'+'"'+predata[31]+'",'+'"z":'+'"'+predata[31]+'"}'
+            print('*********************************')
+            print('The data that will be inserted is')
+            print('*********************************')
+            print(insertData)
+            db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
+                 #[indata] as "Value" as documents
+                {
 
-           }
-        )
+                    "session": [insertData]
+
+                }
+            )
+        except:
+            print("Data Parse not possible")
+
+
+
 
 
 channel.basic_consume(callback, queue='trackPick')
