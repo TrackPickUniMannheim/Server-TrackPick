@@ -91,7 +91,7 @@ def callback(ch, method, properties, indata):
 
             # Data Transformation
 
-            insertData = '{"servertime":'+'"'+predata[3]+'",'+ '"sensortype":'+'"'+predata[31]+'",'+'"clienttime":'+'"'+predata[11]+'",'+'"x":'+'"'+predata[31]+'",'+'"y":'+'"'+predata[31]+'",'+'"z":'+'"'+predata[31]+'"}'
+            insertData = '{"servertime":'+'"'+predata[3]+'",'+ '"sensortype":'+'"'+predata[31]+'",'+'"clienttime":'+'"'+predata[11]+'",'+'"x":'+'"'+predata[19]+'",'+'"y":'+'"'+predata[23]+'",'+'"z":'+'"'+predata[15]+'"}'
             print('*********************************')
             print('The data that will be inserted is')
             print('*********************************')
