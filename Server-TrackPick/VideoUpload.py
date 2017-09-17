@@ -7,13 +7,13 @@ import shutil
 import mimetypes
 from io import BytesIO
 
-#Developers: Zuli Wu, Niranjan Basnet, Nancy Kunath
-#Module Description: Handling incoming streams of video files and save it into localhost filesystem.
+
+# Developers: Zuli Wu, Niranjan Basnet, Nancy Kunath
+# Module Description: Handling incoming streams of video files and save it into localhost filesystem.
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
-
     def do_POST(self):
-        #Serve a POST request.
+        # Serve a POST request.
         r, info = self.deal_post_data()
         print((r, info, "by: ", self.client_address))
         f = BytesIO()
@@ -33,12 +33,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             f.close()
 
     def do_GET(self):
-        #Serve a GET request.
+        # Serve a GET request.
         f = self.send_head()
         if f:
             self.copyfile(f, self.wfile)
             f.close()
-        
+
     def deal_post_data(self):
         content_type = self.headers['content-type']
         if not content_type:
@@ -89,7 +89,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         return (False, "Data have unexpected ends.")
 
     def send_head(self):
-        #This sends the response code and MIME headers.
+        # This sends the response code and MIME headers.
         path = self.translate_path(self.path)
         f = None
         if os.path.isdir(path):
@@ -121,9 +121,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         return f
 
-
     def list_directory(self, path):
-       
+
         try:
             list = os.listdir(path)
         except os.error:
@@ -150,7 +149,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 displayname = name + "@"
                 # Link to a directory displays with "@" and links with "/"
             f.write(('<li><a href="%s">%s</a>\n'
-                    % (urllib.parse.quote(linkname), cgi.escape(displayname))).encode())
+                     % (urllib.parse.quote(linkname), cgi.escape(displayname))).encode())
         f.write(b"</ul>\n<hr>\n</body>\n</html>\n")
         length = f.tell()
         f.seek(0)
@@ -159,12 +158,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(length))
         self.end_headers()
         return f
-     
+
     def translate_path(self, path):
-        #Translate a /-separated PATH to the local filename syntax.
+        # Translate a /-separated PATH to the local filename syntax.
         # Abandon query parameters
-        path = path.split('?',1)[0]
-        path = path.split('#',1)[0]
+        path = path.split('?', 1)[0]
+        path = path.split('#', 1)[0]
         path = posixpath.normpath(urllib.parse.unquote(path))
         words = path.split('/')
         words = [_f for _f in words if _f]
@@ -197,13 +196,14 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
     })
 
     def copyfile(self, source, outputfile):
-    
+
         shutil.copyfileobj(source, outputfile)
 
 
-def uploadExecute(HandlerClass = RequestHandler,
-         ServerClass = http.server.HTTPServer):
+def uploadExecute(HandlerClass=RequestHandler,
+                  ServerClass=http.server.HTTPServer):
     http.server.test(HandlerClass, ServerClass)
- 
+
+
 if __name__ == '__main__':
     uploadExecute()
