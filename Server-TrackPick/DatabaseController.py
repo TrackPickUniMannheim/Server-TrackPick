@@ -52,52 +52,33 @@ def callback(ch, method, properties, indata):
         indata = indata.decode('utf-8')
         #Dequeue from incoming data stream here
         try:
+            #Loading data from the incoming data
             data = json.loads(indata)
-            #print('*********************************')
-            #print('*********************************')
-            #print('*********************************')
-            #print('*********************************')
-            ##print('*********************************')
-            #print('*********************************')
-            #print('This is Original data')
-            print(data)
-            #print('*********************************')
-            #print('*********************************')
-            #print('THis is string data')
-            #print('*********************************')
-            #print('*********************************')
-            #data = str(data)
-            tdata = '"'+str(data)+'"'
-            print(tdata)
-            predata = tdata.split("'")
-            print(predata)
-            #print('*********************************')
-            #print('*********************************')
-            #print('THIS IS SINGELTON DATA')
-            #print(predata[3]) #servertime
-            #print('------------------------------------------------------------------------------------')
-            #print(predata[11]) #timestamp
-            #print('------------------------------------------------------------------------------------')
-            #print(predata[15]) #z
-            #print('------------------------------------------------------------------------------------')
-            #print(predata[19]) #x
-            ##print('------------------------------------------------------------------------------------')
-            #print(predata[23]) #y
-            #print('------------------------------------------------------------------------------------')
-            #print(predata[27]) #Device id   '"sensortype":'+'"'+predata[31]+'",'+
-            #print('------------------------------------------------------------------------------------')
-            #print(predata[31]) #sensor type
-            #print('*********************************')
+            #Passing onto the dictionary to parse first level data
+            dict = data
+            serverTime = dict['servertime']
+            # Passing onto the dictionary to parse second level data
+            clientData = dict['cdata']
+            # Passing onto the dictionary to parse third level data
+            dict = clientData
+            sensorType = dict['sensortype']
+            deviceId = dict['deviceid']
+            mainClientData = dict['data']
+            #Removing the extra brackets to make it parsable for the data
+            mainClientData = mainClientData[0]
+            dict = mainClientData
+            #Main data from the client
+            xData = dict['x']
+            yData = dict['y']
+            zData = dict['z']
+            clientTime = dict['timestamp']
+            #Preparation of the data for effecient insertion
+            insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
 
-            # Data Transformation
-
-            insertData = '{"servertime":'+'"'+predata[3]+'",'+ '"sensortype":'+'"'+predata[31]+'",'+'"clienttime":'+'"'+predata[11]+'",'+'"x":'+'"'+predata[19]+'",'+'"y":'+'"'+predata[23]+'",'+'"z":'+'"'+predata[15]+'"}'
-            print('*********************************')
-            print('The data that will be inserted is')
-            print('*********************************')
             print(insertData)
+
             db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
-                 #[indata] as "Value" as documents
+                # [insertdata] as "Value" as documents
                 {
 
                     "session": [insertData]
@@ -105,25 +86,12 @@ def callback(ch, method, properties, indata):
                 }
             )
         except:
-            print("Data Parse not possible")
-
-
-
-
+            print("Data Parse was not possible for the data. Please try again....")
 
 channel.basic_consume(callback, queue='trackPick')
-
 
 channel.queue_declare(exclusive=True)
 
 channel.start_consuming()
 
-
-
 connection.close()
-
-
-
-
-
-
