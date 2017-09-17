@@ -1,6 +1,3 @@
-
-
- 
 import os
 import posixpath
 import http.server
@@ -8,19 +5,20 @@ import urllib.request, urllib.parse, urllib.error
 import cgi
 import shutil
 import mimetypes
-import re
 from io import BytesIO
- 
 
-class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+#Developers: Zuli Wu, Niranjan Basnet, Nancy Kunath
+#Module Description: Handling incoming streams of video files and save it into localhost filesystem.
+
+class RequestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
-        """Serve a POST request."""
+        #Serve a POST request.
         r, info = self.deal_post_data()
         print((r, info, "by: ", self.client_address))
         f = BytesIO()
         if r:
-            f.write(b"Success!")
+            f.write(b"Successful!")
         else:
             f.write(b"Failed!")
         f.write(info.encode())
@@ -35,7 +33,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             f.close()
 
     def do_GET(self):
-        """Serve a GET request."""
+        #Serve a GET request.
         f = self.send_head()
         if f:
             self.copyfile(f, self.wfile)
@@ -51,13 +49,13 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         line = self.rfile.readline()
         remainbytes -= len(line)
         if not boundary in line:
-            return (False, "Content NOT begin with boundary")
+            return (False, "Content not begin with boundary")
         line = self.rfile.readline()
         remainbytes -= len(line)
 
         filename = self.headers['Filename']
         if not filename:
-            return (False, "Can't find out file name...")
+            return (False, "Cannot find filename..")
         path = self.translate_path(self.path)
 
         fn = os.path.join(path, filename)
@@ -68,7 +66,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         try:
             out = open(fn, 'wb')
         except IOError:
-            return (False, "Can't create file to write, do you have permission to write?")
+            return (False, "Data cannot be written. Please make sure you have write permission.")
 
         if line.strip():
             preline = line
@@ -84,11 +82,11 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     preline = preline[0:-1]
                 out.write(preline)
                 out.close()
-                return (True, "File '%s' has been uploaded!" % fn)
+                return (True, "File '%s' has been successfully uploaded!" % fn)
             else:
                 out.write(preline)
                 preline = line
-        return (False, "Unexpect Ends of data.")
+        return (False, "Data have unexpected ends.")
 
     def send_head(self):
         #This sends the response code and MIME headers.
@@ -129,7 +127,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         try:
             list = os.listdir(path)
         except os.error:
-            self.send_error(404, "No permission to list directory")
+            self.send_error(404, "No permission to access the directory")
             return None
         list.sort(key=lambda a: a.lower())
         f = BytesIO()
@@ -150,7 +148,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 linkname = name + "/"
             if os.path.islink(fullname):
                 displayname = name + "@"
-                # Note: a link to a directory displays with @ and links with /
+                # Link to a directory displays with "@" and links with "/"
             f.write(('<li><a href="%s">%s</a>\n'
                     % (urllib.parse.quote(linkname), cgi.escape(displayname))).encode())
         f.write(b"</ul>\n<hr>\n</body>\n</html>\n")
@@ -163,14 +161,8 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         return f
      
     def translate_path(self, path):
-        """Translate a /-separated PATH to the local filename syntax.
-
-        Components that mean special things to the local file system
-        (e.g. drive or directory names) are ignored.  (XXX They should
-        probably be diagnosed.)
-
-        """
-        # abandon query parameters
+        #Translate a /-separated PATH to the local filename syntax.
+        # Abandon query parameters
         path = path.split('?',1)[0]
         path = path.split('#',1)[0]
         path = posixpath.normpath(urllib.parse.unquote(path))
@@ -209,9 +201,9 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         shutil.copyfileobj(source, outputfile)
 
 
-def test(HandlerClass = SimpleHTTPRequestHandler,
+def uploadExecute(HandlerClass = RequestHandler,
          ServerClass = http.server.HTTPServer):
     http.server.test(HandlerClass, ServerClass)
  
 if __name__ == '__main__':
-    test()
+    uploadExecute()

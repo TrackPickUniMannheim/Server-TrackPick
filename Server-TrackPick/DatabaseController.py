@@ -5,6 +5,8 @@ import json
 
 #@Developers: Niranjan Basnet, Zuli Wu
 
+#Module Description: Handling incoming streams for database interaction.
+
 # Expected Stream format: "{"deviceid":"d37825daa97041dd","sensortype":"accelerometer","
 # data":[{"timestamp":"1496078282698","x":"2.23517e-7","y":"9.77631","z":"0.812348"}]}
 

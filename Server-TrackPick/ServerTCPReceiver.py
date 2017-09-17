@@ -7,6 +7,8 @@ import subprocess
 
 #@Developers: Niranjan Basnet, Zuli Wu
 
+#Module Description: Handling incoming streams for pushing into Rabbitmq queue.
+
 QUIT = False
 
 
