@@ -33,7 +33,6 @@ class ClientThread(threading.Thread): # Class that implements the client threads
 
         else:
             while not done:
-                data = data.decode('utf-8')
                 # Case where data was received
                 if data == "disconnect": # Check whether stream should be stopped or not
                     done = True
@@ -56,7 +55,7 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                     for d in data.split("\n"): # For line wise data in incoming streams
                         data = d
                     outdata = '{"servertime":' + '"' + str(servertime) + '","cdata":' + str(data) + '}'
-                    #print(outdata)
+                    #print(outdata +"\n")
                     print(outdata)
                     #connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
                     channel = connection.channel() # Connect channel through connection
@@ -76,14 +75,18 @@ class ClientThread(threading.Thread): # Class that implements the client threads
             return
 
     def readline(self):
-
-            # Helper function, reads up to 1024 chars from the socket, and returns
+            # Helper function, reads chars from the socket, and returns
             # them as a lowercase string (to make string uniform for all types)
+        data = True
+        buffer = ''
+        while data:
+            data = self.client.recv(1024)
+            buffer += data.decode('utf-8')
 
-        result = self.client.recv(1024)
-        if (None != result):
-            result = result.strip().lower()
-        return result
+            if (buffer.find('\n') != -1):
+                data = False
+        buffer = buffer.strip().lower()
+        return buffer
 
     def writeline(self, text):
 
