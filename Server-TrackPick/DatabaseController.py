@@ -16,12 +16,10 @@ datenow = str(datenow)
 collname = userid+'-'+datenow # Collection name when new instance is created
 
 try:
-
     from pymongo import MongoClient
     client = MongoClient('localhost', 27017)
     db = client['test_database']
     collection = db['test_database'] # test_database to mock up and test instead of the actual database 'trackpick'
-
     if collection is not None: # See whether the instance of database is created or not
 
         print('Connecting with Database...')
@@ -65,28 +63,31 @@ def callback(ch, method, properties, indata):
             dict = clientData
             sensorType = dict['sensortype']
             deviceId = dict['deviceid']
-            mainClientData = dict['data']
+            mainClientDataAll = dict['data']
             #Removing the extra brackets to make it parsable for the data
-            mainClientData = mainClientData[0]
-            dict = mainClientData
-            #Main data from the client
-            xData = dict['x']
-            yData = dict['y']
-            zData = dict['z']
-            clientTime = dict['timestamp']
-            #Preparation of the data for effecient insertion
-            insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
+            
+            #Loop over buffered data and insert each value seperately into mongo
+            for x in range(0,len(mainClientDataAll)):
+                mainClientData = mainClientDataAll[x]
+                dict = mainClientData
+                #Main data from the client
+                xData = dict['x']
+                yData = dict['y']
+                zData = dict['z']
+                clientTime = dict['timestamp']
+                #Preparation of the data for effecient insertion
+                insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
 
-            print(insertData)
+                print(insertData)
 
-            db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
-                # [insertdata] as "Value" as documents
-                {
+                db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
+                    # [insertdata] as "Value" as documents
+                    {
 
-                    "session": [insertData]
+                        "session": [insertData]
 
-                }
-            )
+                    }
+                )
         except:
             print("Data Parse was not possible for the data. Please try again....")
 
