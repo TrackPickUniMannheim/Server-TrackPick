@@ -11,7 +11,7 @@ import json
 # data":[{"timestamp":"1496078282698","x":"2.23517e-7","y":"9.77631","z":"0.812348"}]}
 
 userid = " ".join(sys.argv[1:]) # Userid from the terminal signifies the collection name for the user
-datenow = time.strftime("%d/%m/%Y-%X") # Date time signifies the unique timestamp recorded in session
+datenow = time.strftime('%Y.%m.%d-%H.%M.%S') # Date time signifies the unique timestamp recorded in session
 datenow = str(datenow)
 collname = userid+'-'+datenow # Collection name when new instance is created
 
@@ -91,10 +91,42 @@ def callback(ch, method, properties, indata):
         except:
             print("Data Parse was not possible for the data. Please try again....")
 
+
+        print('Data successfully stored into MongoDB')
+
 channel.basic_consume(callback, queue='trackPick')
 
 channel.queue_declare(exclusive=True)
 
 channel.start_consuming()
+
+try:
+    coll_records = []
+    from pymongo import MongoClient
+    client = MongoClient('localhost', 27017)
+    db = client['test_database']
+    for x in db[collname].find():
+        coll_record = []
+        dict = json.loads(''.join(map(str, x['session'])))
+        coll_record.append(dict['servertime'])
+        coll_record.append(dict['sensortype'])
+        coll_record.append(dict['deviceid'])
+        coll_record.append(dict['clienttime'])
+        coll_record.append(dict['x'])
+        coll_record.append(dict['y'])
+        coll_record.append(dict['z'])
+        coll_records.append(coll_record)
+
+    # Iterate through the list of collection records and write them to the csv file
+        csvname = collname+'.csv'
+        with open(csvname, "w") as f:
+            fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            writer = csv.writer(f)
+            writer.writerows(coll_records)
+    print('Data Extraction was successfull!')
+except:
+    print('Data Extraction was not possible')
 
 connection.close()
