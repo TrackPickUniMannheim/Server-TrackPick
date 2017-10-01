@@ -3,14 +3,15 @@ import socket
 import threading
 import time
 import pika
-import subprocess
+from pika import exceptions
+import logging
 
 #@Developers: Niranjan Basnet, Zuli Wu
 
 #Module Description: Handling incoming streams for pushing into Rabbitmq queue.
 
 QUIT = False
-
+LOGGER = logging.getLogger(__name__)
 
 class ClientThread(threading.Thread): # Class that implements the client threads in this server
 
@@ -36,12 +37,17 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                 # Case where data was received
                 if data == "disconnect": # Check whether stream should be stopped or not
                     done = True
+                    #print("Found disconnect")
                     self.client.close()
-                    connection.close()
+                    #connection.close()
                     return
                 elif data.strip() == '': # Check for whitespaces in the incoming streams
+                    #print("Found disconnect again")
                     self.client.close()
                     connection.close()
+                    print("Connection Closed")
+                    QUIT = True
+                    #channel.close()
                     #exit()
                     sys.exit()
                     return
@@ -91,6 +97,30 @@ class ClientThread(threading.Thread): # Class that implements the client threads
     def writeline(self, text):
 
         self.client.send(text.strip().decode('utf-8') + '\n')
+    def close(self,reply_code=200,reply_text='Normal Shutdown'):
+        try:
+            if self.is_closed:
+                LOGGER.debug('Close called on closed connection (%s): %s',
+                             reply_code, reply_text)
+                return
+            LOGGER.info('Closing connection (%s): %s', reply_code, reply_text)
+            self._user_initiated_close = True
+            for impl_channel in pika.compat.dictvalues(self._impl._channels):
+                channel = impl_channel._get_cookie()
+                if channel.is_open:
+                    try:
+                        channel.close(reply_code, reply_text)
+                    except exceptions.ChannelClosed as exc:
+                        # Log and suppress broker-closed channel
+                        LOGGER.warning('Got ChannelClosed while closing channel '
+                                       'from connection.close: %r', exc)
+
+            self._impl.close(reply_code, reply_text)
+        except:
+            print("Connection could not be closed")
+
+        #self._flush_output(self._closed_result.is_ready)
+
 
 
 class Server:

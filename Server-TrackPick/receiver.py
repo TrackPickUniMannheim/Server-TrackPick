@@ -66,7 +66,7 @@ def callback(ch, method, properties, indata):
             deviceId = dict['deviceid']
             mainClientDataAll = dict['data']
             #Removing the extra brackets to make it parsable for the data
-            
+
             #Loop over buffered data and insert each value seperately into mongo
             for x in range(0,len(mainClientDataAll)):
                 mainClientData = mainClientDataAll[x]
