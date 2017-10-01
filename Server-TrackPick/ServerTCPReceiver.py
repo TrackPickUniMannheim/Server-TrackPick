@@ -112,7 +112,7 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                         channel.close(reply_code, reply_text)
                     except exceptions.ChannelClosed as exc:
                         # Log and suppress broker-closed channel
-                        LOGGER.warning('Got ChannelClosed while closing channel '
+                        LOGGER.warning('Got Channel Closed exception while closing channel '
                                        'from connection.close: %r', exc)
 
             self._impl.close(reply_code, reply_text)
