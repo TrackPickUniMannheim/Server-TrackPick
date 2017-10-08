@@ -44,7 +44,12 @@ class ClientThread(threading.Thread): # Class that implements the client threads
                 elif data.strip() == '': # Check for whitespaces in the incoming streams
                     #print("Found disconnect again")
                     self.client.close()
+                    channel.basic_publish(exchange='',
+                                          routing_key='trackPick',  # Routing with key "trackPick"
+                                          body="sessionclosed")
+                    print("Session closed message sent")
                     connection.close()
+
                     print("Connection Closed")
                     QUIT = True
                     #channel.close()

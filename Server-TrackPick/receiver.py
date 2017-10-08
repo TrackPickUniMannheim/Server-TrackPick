@@ -2,6 +2,7 @@ import pika
 import sys
 import time
 import json
+import threading
 import csv
 from pika import exceptions
 import logging
@@ -11,10 +12,9 @@ from collections import deque
 #@Developers: Niranjan Basnet, Zuli Wu
 
 #Module Description: Handling incoming streams for database interaction.
-
+QUIT = False
 # Expected Stream format: "{"deviceid":"d37825daa97041dd","sensortype":"accelerometer","
 # data":[{"timestamp":"1496078282698","x":"2.23517e-7","y":"9.77631","z":"0.812348"},{"timestamp":"1496078282698","x":"2.23517e-7","y":"9.77631","z":"0.812348"}]}
-
 class _CallbackResult(object):
     """ CallbackResult is a non-thread-safe implementation for receiving
     callback results; INTERNAL USE ONLY!
@@ -74,7 +74,10 @@ try:
     print("HERE3")
     channel.queue_declare(queue='trackPick')
     print("HERE4")
+    if(QUIT is True):
+        print("The queue does not exists")
 except:
+
     print("No queue exists")
 
 def close(self,reply_code=200,reply_text='Normal Shutdown'):
@@ -102,6 +105,7 @@ def close(self,reply_code=200,reply_text='Normal Shutdown'):
 
         except:
             print("Connection could not be closed")
+
 def cleanup(self):
     self._impl.ioloop.deactivate_poller()
     self._ready_events.clear()
@@ -131,11 +135,12 @@ def queue_delete(self, queue='', if_unused=False, if_empty=False):
 
             self._flush_output(delete_ok_result.is_ready)
             return delete_ok_result.value.method_frame
+            #return QUIT is True
 
 def callback(ch, method, properties, indata):
 
     try:
-        print("HERE2")
+        print("This is inside queue")
         if indata is None:
             print("No data in the queue. Please restart the session to fill the queue first")
         else:
@@ -234,6 +239,6 @@ channel.queue_declare(exclusive=True)
 
 channel.start_consuming()
 
-
+print("Data not found")
 
 connection.close()

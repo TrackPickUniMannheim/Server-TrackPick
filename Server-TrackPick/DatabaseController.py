@@ -113,6 +113,19 @@ def queue_purge(self, queue=''):
             self._flush_output(purge_ok_result.is_ready)
             return purge_ok_result.value.method_frame
 
+def queue_delete(self, queue='', if_unused=False, if_empty=False):
+
+        with _CallbackResult(self._MethodFrameCallbackResultArgs) as \
+                delete_ok_result:
+            self._impl.queue_delete(callback=delete_ok_result.set_value_once,
+                                    queue=queue,
+                                    if_unused=if_unused,
+                                    if_empty=if_empty,
+                                    nowait=False)
+
+            self._flush_output(delete_ok_result.is_ready)
+            return delete_ok_result.value.method_frame
+
 
 def callback(ch, method, properties, indata):
     if indata is None:
@@ -123,47 +136,51 @@ def callback(ch, method, properties, indata):
         #Dequeue from incoming data stream here
         try:
             DONE = False
-            #Loading data from the incoming data
-            data = json.loads(indata)
-            #Passing onto the dictionary to parse first level data
-            dict = data
-            serverTime = dict['servertime']
-            # Passing onto the dictionary to parse second level data
-            clientData = dict['cdata']
-            # Passing onto the dictionary to parse third level data
-            dict = clientData
-            sensorType = dict['sensortype']
-            deviceId = dict['deviceid']
-            mainClientDataAll = dict['data']
-            #Removing the extra brackets to make it parsable for the data
-
-            #Loop over buffered data and insert each value seperately into mongo
-            for x in range(0,len(mainClientDataAll)):
-                mainClientData = mainClientDataAll[x]
-                dict = mainClientData
-                #Main data from the client
-                xData = dict['x']
-                yData = dict['y']
-                zData = dict['z']
-                clientTime = dict['timestamp']
-                #Preparation of the data for effecient insertion
-                insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
-
-                print(insertData)
-
-                db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
-                    # [insertdata] as "Value" as documents
-                    {
-
-                        "session": [insertData]
-
-                    }
-                )
+            if(indata=='sessionclosed'):
+                print("Inside the Done folder")
                 DONE = True
+            #Loading data from the incoming data
+            else:
+                data = json.loads(indata)
+                #Passing onto the dictionary to parse first level data
+                dict = data
+                serverTime = dict['servertime']
+                # Passing onto the dictionary to parse second level data
+                clientData = dict['cdata']
+                # Passing onto the dictionary to parse third level data
+                dict = clientData
+                sensorType = dict['sensortype']
+                deviceId = dict['deviceid']
+                mainClientDataAll = dict['data']
+                #Removing the extra brackets to make it parsable for the data
+
+                #Loop over buffered data and insert each value seperately into mongo
+                for x in range(0,len(mainClientDataAll)):
+                    mainClientData = mainClientDataAll[x]
+                    dict = mainClientData
+                    #Main data from the client
+                    xData = dict['x']
+                    yData = dict['y']
+                    zData = dict['z']
+                    clientTime = dict['timestamp']
+                    #Preparation of the data for effecient insertion
+                    insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
+
+                    print(insertData)
+
+                    db.get_collection(name=getcoll).insert_one(  # Database instance finaldata as "Key"
+                        # [insertdata] as "Value" as documents
+                        {
+
+                            "session": [insertData]
+
+                        }
+                    )
+                #DONE = True
         except:
             print("Data Parse was not possible for the data. Please try again....")
 
-
+        #DONE = True
         print('Data successfully stored into MongoDB')
 
         if DONE is True:
@@ -187,18 +204,18 @@ def callback(ch, method, properties, indata):
 
                 # Iterate through the list of collection records and write them to the csv file
                     #filedirectory = '/Files/'
-                    csvname = collname+'.csv'
-                    with open(csvname, "w") as f:
-                        fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
-                        writer = csv.DictWriter(f, fieldnames=fields)
-                        writer.writeheader()
-                        writer = csv.writer(f)
-                        writer.writerows(coll_records)
+                csvname = collname+'.csv'
+                with open(csvname, "w") as f:
+                    fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
+                    writer = csv.DictWriter(f, fieldnames=fields)
+                    writer.writeheader()
+                    writer = csv.writer(f)
+                    writer.writerows(coll_records)
 
                 print('Data Extraction was successfull!')
                 try:
-                    channel.queue_purge(queue='trackPick')
-                    print("Queue is cleared")
+                    channel.queue_delete(queue='trackPick')
+                    print("Queue is deleted")
                 except:
                     print("Queue was not cleared")
                 connection.close()
