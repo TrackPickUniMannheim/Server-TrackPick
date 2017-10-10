@@ -204,7 +204,11 @@ def callback(ch, method, properties, indata):
 
                 # Iterate through the list of collection records and write them to the csv file
                     #filedirectory = '/Files/'
-                if(dict['sensortype']=="accelerometer"):
+                    sensortype1 = dict['sensortype']
+                    print("------------------------------------------------------------------------------------")
+                    print(sensortype1)
+                    print()
+                if(dict['sensortype']=='accelerometer'):
 
                     csvname = collname+'accelerometer'+'.csv'
                     with open(csvname, "w") as f:
@@ -213,15 +217,15 @@ def callback(ch, method, properties, indata):
                         writer.writeheader()
                         writer = csv.writer(f)
                         writer.writerows(coll_records)
-                elif(dict['sensortype']=="magnetometer"):
-                    csvname = collname+'magnetometer'+'.csv'
+                elif(dict['sensortype']=='magneticfield'):
+                    csvname = collname+'magneticfield'+'.csv'
                     with open(csvname, "w") as f:
                         fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
                         writer = csv.DictWriter(f, fieldnames=fields)
                         writer.writeheader()
                         writer = csv.writer(f)
                         writer.writerows(coll_records)
-                elif(dict['sensortype']=="gyroscope"):
+                elif(dict['sensortype']=='gyroscope'):
                     csvname = collname+'gyroscope'+'.csv'
                     with open(csvname, "w") as f:
                         fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
