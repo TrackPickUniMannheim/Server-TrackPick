@@ -7,7 +7,7 @@ from pymongo import MongoClient
 #Connection to MongoDB with specified Collection
 client = MongoClient('localhost', 27017)
 db = client['test_database']
-collection = 'GlassTest-2017.10.11-19.17.11'
+collection = '100-3+3-3-2017.10.12-00.52.33'
 
 # Client Timestamp Variables
 timeold_client_phone_accelerometer = 0
@@ -376,20 +376,20 @@ plt.show()
 
 print('----------------difference Timestamp Average------------------------------------------')
 if (len(coll_eval_difference_phone_accelerometer) != 0): print('Difference Phone Accelerometer AVG: \t', (sum(coll_eval_difference_phone_accelerometer)/float(len(coll_eval_difference_phone_accelerometer))))
-if (len(coll_eval_difference_phone_gyroscope) != 0): print('Difference Phone Gyroscope AVG: \t\t', (sum(coll_eval_difference_phone_gyroscope)/float(len(coll_eval_difference_phone_gyroscope))))
+if (len(coll_eval_difference_phone_gyroscope) != 0): print('Difference Phone Gyroscope AVG: \t', (sum(coll_eval_difference_phone_gyroscope)/float(len(coll_eval_difference_phone_gyroscope))))
 if (len(coll_eval_difference_phone_magnetic) != 0): print('Difference Phone MagneticField AVG: \t', (sum(coll_eval_difference_phone_magnetic)/float(len(coll_eval_difference_phone_magnetic))))
 if (len(coll_eval_difference_watch_accelerometer) != 0): print('Difference Watch Accelerometer AVG: \t', (sum(coll_eval_difference_watch_accelerometer)/float(len(coll_eval_difference_watch_accelerometer))))
-if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope AVG: \t\t', (sum(coll_eval_difference_watch_gyroscope)/float(len(coll_eval_difference_watch_gyroscope))))
+if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope AVG: \t', (sum(coll_eval_difference_watch_gyroscope)/float(len(coll_eval_difference_watch_gyroscope))))
 if (len(coll_eval_difference_watch_magnetic) != 0): print('Difference Watch MagneticField AVG: \t', (sum(coll_eval_difference_watch_magnetic)/float(len(coll_eval_difference_watch_magnetic))))
 if (len(coll_eval_difference_glass_accelerometer) != 0): print('Difference Glass Accelerometer AVG: \t', (sum(coll_eval_difference_glass_accelerometer)/float(len(coll_eval_difference_glass_accelerometer))))
 if (len(coll_eval_difference_glass_magnetic) != 0): print('Difference Glass MagneticField AVG: \t', (sum(coll_eval_difference_glass_magnetic)/float(len(coll_eval_difference_glass_magnetic))))
 
 print('----------------difference Timestamp Variance------------------------------------------')
 if (len(coll_eval_difference_phone_accelerometer) != 0): print('Difference Phone Accelerometer VAR: \t', (np.var(coll_eval_difference_phone_accelerometer)))
-if (len(coll_eval_difference_phone_gyroscope) != 0): print('Difference Phone Gyroscope VAR: \t\t', (np.var(coll_eval_difference_phone_gyroscope)))
+if (len(coll_eval_difference_phone_gyroscope) != 0): print('Difference Phone Gyroscope VAR: \t', (np.var(coll_eval_difference_phone_gyroscope)))
 if (len(coll_eval_difference_phone_magnetic) != 0): print('Difference Phone MagneticField VAR: \t', (np.var(coll_eval_difference_phone_magnetic)))
 if (len(coll_eval_difference_watch_accelerometer) != 0): print('Difference Watch Accelerometer VAR: \t', (np.var(coll_eval_difference_watch_accelerometer)))
-if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope VAR: \t\t', (np.var(coll_eval_difference_watch_gyroscope)))
+if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope VAR: \t', (np.var(coll_eval_difference_watch_gyroscope)))
 if (len(coll_eval_difference_watch_magnetic) != 0): print('Difference Watch MagneticField VAR: \t', (np.var(coll_eval_difference_watch_magnetic)))
 if (len(coll_eval_difference_glass_accelerometer) != 0): print('Difference Glass Accelerometer VAR: \t', (np.var(coll_eval_difference_glass_accelerometer)))
 if (len(coll_eval_difference_glass_magnetic) != 0): print('Difference Glass MagneticField VAR: \t', (np.var(coll_eval_difference_glass_magnetic)))
