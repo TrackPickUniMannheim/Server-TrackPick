@@ -186,31 +186,50 @@ def callback(ch, method, properties, indata):
         if DONE is True:
             print("Creating CSV now")
             try:
-                coll_records = []
+                coll_sensors = []
+                coll_devices = []
+
                 #from pymongo import MongoClient
                 #client = MongoClient('localhost', 27017)
-               # db = client['test_database']
+                # db = client['test_database']
                 for x in db[collname].find():
                     coll_record = []
                     dict = json.loads(''.join(map(str, x['session'])))
-                    coll_record.append(dict['servertime'])
-                    coll_record.append(dict['sensortype'])
-                    coll_record.append(dict['deviceid'])
-                    coll_record.append(dict['clienttime'])
-                    coll_record.append(dict['x'])
-                    coll_record.append(dict['y'])
-                    coll_record.append(dict['z'])
-                    coll_records.append(coll_record)
 
-                # Iterate through the list of collection records and write them to the csv file
-                    #filedirectory = '/Files/'
-                csvname = collname+'.csv'
-                with open(csvname, "w") as f:
-                    fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
-                    writer = csv.DictWriter(f, fieldnames=fields)
-                    writer.writeheader()
-                    writer = csv.writer(f)
-                    writer.writerows(coll_records)
+                    if not dict['deviceid'] in coll_devices:
+                        coll_devices.append(dict['deviceid'])
+
+                    if not dict['sensortype'] in coll_sensors:
+                        coll_sensors.append(dict['sensortype'])
+
+                for y in coll_devices :
+                    for z in coll_sensors :
+                        coll_records = []
+                        for x in db[collname].find():
+                            coll_record = []
+                            dict = json.loads(''.join(map(str, x['session'])))
+
+                            if dict['deviceid'] == y and dict['sensortype'] == z:
+                                coll_record.append(dict['servertime'])
+                                coll_record.append(dict['sensortype'])
+                                coll_record.append(dict['deviceid'])
+                                coll_record.append(dict['clienttime'])
+                                coll_record.append(dict['x'])
+                                coll_record.append(dict['y'])
+                                coll_record.append(dict['z'])
+                                coll_records.append(coll_record)
+                        
+                        if not len(coll_records) == 0:
+                            csvname =collname+ y+'-'+z+'.csv'
+                            csvname = str(csvname)
+
+                            with open(csvname, "w") as f:
+                                fields = ['servertime','sensortype','deviceid','clienttime','x','y','z']
+                                writer = csv.DictWriter(f, fieldnames=fields)
+                                writer.writeheader()
+                                writer = csv.writer(f)
+                                writer.writerows(coll_records)
+
 
                 print('Data Extraction was successfull!')
                 try:
@@ -220,8 +239,7 @@ def callback(ch, method, properties, indata):
                     print("Queue was not cleared")
                 connection.close()
 
-            except:
-                print('Data Extraction was not possible')
+            except Exception as e: print(e)
 
 
 channel.basic_consume(callback, queue='trackPick')
