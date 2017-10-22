@@ -159,12 +159,17 @@ def callback(ch, method, properties, indata):
                     mainClientData = mainClientDataAll[x]
                     dict = mainClientData
                     #Main data from the client
-                    xData = dict['x']
-                    yData = dict['y']
-                    zData = dict['z']
-                    clientTime = dict['timestamp']
-                    #Preparation of the data for effecient insertion
-                    insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '"}'
+
+                    if sensorType == 'video':
+                        videoname = dict['videoname']
+                        insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":"null","x":"null","y":"null","z":"null","videofilename":' + '"' + videoname + '"}'
+                    else :
+                        clientTime = dict['timestamp']
+                        xData = dict['x']
+                        yData = dict['y']
+                        zData = dict['z']
+                        #Preparation of the data for effecient insertion
+                        insertData = '{"servertime":' + '"' + serverTime + '",' + '"sensortype":' + '"' + sensorType +'",' + '"deviceid":' + '"' + deviceId + '",' + '"clienttime":' + '"' + clientTime + '",' + '"x":' + '"' + xData + '",' + '"y":' + '"' + yData + '",' + '"z":' + '"' + zData + '",' + '"videofilename":"null"}'
 
                     print(insertData)
 
