@@ -7,7 +7,7 @@ from pymongo import MongoClient
 #Connection to MongoDB with specified Collection
 client = MongoClient('localhost', 27017)
 db = client['test_database']
-collection = '50-3+3-3-2017.10.18-13.15.02'
+collection = 'TestSamplingRatesGlass-2017.10.22-19.00.32'
 
 # Client Timestamp Variables
 timeold_client_phone_accelerometer = 0
@@ -37,6 +37,10 @@ coll_eval_client_watch_magnetic = []
 timeold_client_glass_accelerometer = 0
 timenew_client_glass_accelerometer = 0
 coll_eval_client_glass_accelerometer = []
+
+timeold_client_glass_gyroscope = 0
+timenew_client_glass_gyroscope = 0
+coll_eval_client_glass_gyroscope = []
 
 timeold_client_glass_magnetic = 0
 timenew_client_glass_magnetic = 0
@@ -71,6 +75,10 @@ timeold_server_glass_accelerometer = 0
 timenew_server_glass_accelerometer = 0
 coll_eval_server_glass_accelerometer = []
 
+timeold_server_glass_gyroscope = 0
+timenew_server_glass_gyroscope = 0
+coll_eval_server_glass_gyroscope = []
+
 timeold_server_glass_magnetic = 0
 timenew_server_glass_magnetic = 0
 coll_eval_server_glass_magnetic = []
@@ -83,6 +91,7 @@ coll_eval_difference_watch_accelerometer = []
 coll_eval_difference_watch_gyroscope = []
 coll_eval_difference_watch_magnetic = []
 coll_eval_difference_glass_accelerometer = []
+coll_eval_difference_glass_gyroscope = []
 coll_eval_difference_glass_magnetic = []
 
 # Analyze Timestamps
@@ -176,6 +185,18 @@ for x in db[collection].find():
             coll_eval_client_glass_accelerometer.append(timenew_client_glass_accelerometer - timeold_client_glass_accelerometer)
         timeold_client_glass_accelerometer = timenew_client_glass_accelerometer
 
+    elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == '62c7c4a8aa33b123':
+        timenew_server_glass_gyroscope = int(float(dict['servertime']))
+        if timeold_server_glass_gyroscope != 0 and (timenew_server_glass_gyroscope - timeold_server_glass_gyroscope) != 0:
+            coll_eval_server_glass_gyroscope.append(timenew_server_glass_gyroscope - timeold_server_glass_gyroscope)
+            coll_eval_difference_glass_gyroscope.append(timeold_server_glass_gyroscope-timeold_client_glass_gyroscope)
+        timeold_server_glass_gyroscope = timenew_server_glass_gyroscope
+
+        timenew_client_glass_gyroscope = int(float(dict['clienttime']))
+        if timeold_client_glass_gyroscope != 0:
+            coll_eval_client_glass_gyroscope.append(timenew_client_glass_gyroscope - timeold_client_glass_gyroscope)
+        timeold_client_glass_gyroscope = timenew_client_glass_gyroscope
+
     elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == '62c7c4a8aa33b123':
         timenew_server_glass_magnetic = int(float(dict['servertime']))
         if timeold_server_glass_magnetic != 0 and (timenew_server_glass_magnetic - timeold_server_glass_magnetic) != 0:
@@ -196,6 +217,7 @@ if (len(coll_eval_server_watch_accelerometer) != 0): del coll_eval_server_watch_
 if (len(coll_eval_server_watch_gyroscope) != 0): del coll_eval_server_watch_gyroscope[-1]
 if (len(coll_eval_server_watch_magnetic) != 0): del coll_eval_server_watch_magnetic[-1]
 if (len(coll_eval_server_glass_accelerometer) != 0): del coll_eval_server_glass_accelerometer[-1]
+if (len(coll_eval_server_glass_gyroscope) != 0): del coll_eval_server_glass_gyroscope[-1]
 if (len(coll_eval_server_glass_magnetic) != 0): del coll_eval_server_glass_magnetic[-1]
 
 # Show general statistics
@@ -207,6 +229,7 @@ print ('Measurements for Watch Accelerometer: \t', len(coll_eval_client_watch_ac
 print ('Measurements for Watch Gyroscope: \t', len(coll_eval_client_watch_gyroscope) +1)
 print ('Measurements for Watch MagneticField: \t', len(coll_eval_client_watch_magnetic) +1)
 print ('Measurements for Glass Accelerometer: \t', len(coll_eval_client_glass_accelerometer) +1)
+print ('Measurements for Glass Gyroscope: \t', len(coll_eval_client_glass_gyroscope) +1)
 print ('Measurements for Glass MagneticField: \t', len(coll_eval_client_glass_magnetic) +1)      
     
 
@@ -251,12 +274,21 @@ plt.plot(coll_eval_client_glass_accelerometer)
 plt.ylabel('timedifference in ms')
 plt.title('Client Glass Accelerometer')
 plt.savefig('Images/Client_Glass_Accelerometer.png')
+plt.show()
+plt.clf()
+
+plt.plot(coll_eval_client_glass_gyroscope)
+plt.ylabel('timedifference in ms')
+plt.title('Client Glass Gyroscope')
+plt.savefig('Images/Client_Glass_Gyroscope.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_glass_magnetic)
 plt.ylabel('timedifference in ms')
 plt.title('Client Glass MagneticField')
 plt.savefig('Images/Client_Glass_MagneticField.png')
+plt.show()
 plt.clf()
 
 print('----------------Client Timestamp Average------------------------------------------')
@@ -267,6 +299,7 @@ if (len(coll_eval_client_watch_accelerometer) != 0): print('Client Watch Acceler
 if (len(coll_eval_client_watch_gyroscope) != 0): print('Client Watch Gyroscope AVG: \t\t', (sum(coll_eval_client_watch_gyroscope)/float(len(coll_eval_client_watch_gyroscope))))
 if (len(coll_eval_client_watch_magnetic) != 0): print('Client Watch MagneticField AVG: \t', (sum(coll_eval_client_watch_magnetic)/float(len(coll_eval_client_watch_magnetic))))
 if (len(coll_eval_client_glass_accelerometer) != 0): print('Client Glass Accelerometer AVG: \t', (sum(coll_eval_client_glass_accelerometer)/float(len(coll_eval_client_glass_accelerometer))))
+if (len(coll_eval_client_glass_gyroscope) != 0): print('Client Glass Gyroscope AVG: \t', (sum(coll_eval_client_glass_gyroscope)/float(len(coll_eval_client_glass_gyroscope))))
 if (len(coll_eval_client_glass_magnetic) != 0): print('Client Glass MagneticField AVG: \t', (sum(coll_eval_client_glass_magnetic)/float(len(coll_eval_client_glass_magnetic))))
 
 print('----------------Client Timestamp Variance------------------------------------------')
@@ -277,6 +310,7 @@ if (len(coll_eval_client_watch_accelerometer) != 0): print('Client Watch Acceler
 if (len(coll_eval_client_watch_gyroscope) != 0): print('Client Watch Gyroscope VAR: \t\t', (np.var(coll_eval_client_watch_gyroscope)))
 if (len(coll_eval_client_watch_magnetic) != 0): print('Client Watch MagneticField VAR: \t', (np.var(coll_eval_client_watch_magnetic)))
 if (len(coll_eval_client_glass_accelerometer) != 0): print('Client Glass Accelerometer VAR: \t', (np.var(coll_eval_client_glass_accelerometer)))
+if (len(coll_eval_client_glass_gyroscope) != 0): print('Client Glass Gyroscope VAR: \t', (np.var(coll_eval_client_glass_gyroscope)))
 if (len(coll_eval_client_glass_magnetic) != 0): print('Client Glass MagneticField VAR: \t', (np.var(coll_eval_client_glass_magnetic)))
 
 
@@ -323,6 +357,12 @@ plt.title('Server Glass Accelerometer')
 plt.savefig('Images/Server_Glass_Accelerometer.png')
 plt.clf()
 
+plt.plot(coll_eval_server_glass_gyroscope)
+plt.ylabel('timedifference in ms')
+plt.title('Server Glass Gyroscope')
+plt.savefig('Images/Server_Glass_Gyroscope.png')
+plt.clf()
+
 plt.plot(coll_eval_server_glass_magnetic)
 plt.ylabel('timedifference in ms')
 plt.title('Server Glass MagneticField')
@@ -337,6 +377,7 @@ if (len(coll_eval_server_watch_accelerometer) != 0): print('Server Watch Acceler
 if (len(coll_eval_server_watch_gyroscope) != 0): print('Server Watch Gyroscope AVG: \t\t', (sum(coll_eval_server_watch_gyroscope)/float(len(coll_eval_server_watch_gyroscope))))
 if (len(coll_eval_server_watch_magnetic) != 0): print('Server Watch MagneticField AVG: \t', (sum(coll_eval_server_watch_magnetic)/float(len(coll_eval_server_watch_magnetic))))
 if (len(coll_eval_server_glass_accelerometer) != 0): print('Server Glass Accelerometer AVG: \t', (sum(coll_eval_server_glass_accelerometer)/float(len(coll_eval_server_glass_accelerometer))))
+if (len(coll_eval_server_glass_gyroscope) != 0): print('Server Glass Gyroscope AVG: \t', (sum(coll_eval_server_glass_gyroscope)/float(len(coll_eval_server_glass_gyroscope))))
 if (len(coll_eval_server_glass_magnetic) != 0): print('Server Glass MagneticField AVG: \t', (sum(coll_eval_server_glass_magnetic)/float(len(coll_eval_server_glass_magnetic))))
 
 print('----------------Server Timestamp Variance------------------------------------------')
@@ -347,6 +388,7 @@ if (len(coll_eval_server_watch_accelerometer) != 0): print('Server Watch Acceler
 if (len(coll_eval_server_watch_gyroscope) != 0): print('Server Watch Gyroscope VAR: \t\t', (np.var(coll_eval_server_watch_gyroscope)))
 if (len(coll_eval_server_watch_magnetic) != 0): print('Server Watch MagneticField VAR: \t', (np.var(coll_eval_server_watch_magnetic)))
 if (len(coll_eval_server_glass_accelerometer) != 0): print('Server Glass Accelerometer VAR: \t', (np.var(coll_eval_server_glass_accelerometer)))
+if (len(coll_eval_server_glass_gyroscope) != 0): print('Server Glass Gyroscope VAR: \t', (np.var(coll_eval_server_glass_gyroscope)))
 if (len(coll_eval_server_glass_magnetic) != 0): print('Server Glass MagneticField VAR: \t', (np.var(coll_eval_server_glass_magnetic)))
 
 # 3. Evaluate Timedifference Client Server
@@ -392,6 +434,12 @@ plt.title('Difference Glass Accelerometer')
 plt.savefig('Images/Difference_Glass_Accelerometer.png')
 plt.clf()
 
+plt.plot(coll_eval_difference_glass_gyroscope)
+plt.ylabel('timedifference in ms')
+plt.title('Difference Glass Gyroscope')
+plt.savefig('Images/Difference_Glass_Gyroscope.png')
+plt.clf()
+
 plt.plot(coll_eval_difference_glass_magnetic)
 plt.ylabel('timedifference in ms')
 plt.title('Difference Glass MagneticField')
@@ -406,6 +454,7 @@ if (len(coll_eval_difference_watch_accelerometer) != 0): print('Difference Watch
 if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope AVG: \t', (sum(coll_eval_difference_watch_gyroscope)/float(len(coll_eval_difference_watch_gyroscope))))
 if (len(coll_eval_difference_watch_magnetic) != 0): print('Difference Watch MagneticField AVG: \t', (sum(coll_eval_difference_watch_magnetic)/float(len(coll_eval_difference_watch_magnetic))))
 if (len(coll_eval_difference_glass_accelerometer) != 0): print('Difference Glass Accelerometer AVG: \t', (sum(coll_eval_difference_glass_accelerometer)/float(len(coll_eval_difference_glass_accelerometer))))
+if (len(coll_eval_difference_glass_gyroscope) != 0): print('Difference Glass Gyroscope AVG: \t', (sum(coll_eval_difference_glass_gyroscope)/float(len(coll_eval_difference_glass_gyroscope))))
 if (len(coll_eval_difference_glass_magnetic) != 0): print('Difference Glass MagneticField AVG: \t', (sum(coll_eval_difference_glass_magnetic)/float(len(coll_eval_difference_glass_magnetic))))
 
 print('----------------difference Timestamp Variance------------------------------------------')
@@ -416,4 +465,5 @@ if (len(coll_eval_difference_watch_accelerometer) != 0): print('Difference Watch
 if (len(coll_eval_difference_watch_gyroscope) != 0): print('Difference Watch Gyroscope VAR: \t', (np.var(coll_eval_difference_watch_gyroscope)))
 if (len(coll_eval_difference_watch_magnetic) != 0): print('Difference Watch MagneticField VAR: \t', (np.var(coll_eval_difference_watch_magnetic)))
 if (len(coll_eval_difference_glass_accelerometer) != 0): print('Difference Glass Accelerometer VAR: \t', (np.var(coll_eval_difference_glass_accelerometer)))
+if (len(coll_eval_difference_glass_gyroscope) != 0): print('Difference Glass Gyroscope VAR: \t', (np.var(coll_eval_difference_glass_gyroscope)))
 if (len(coll_eval_difference_glass_magnetic) != 0): print('Difference Glass MagneticField VAR: \t', (np.var(coll_eval_difference_glass_magnetic)))
