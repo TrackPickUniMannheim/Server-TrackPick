@@ -1,13 +1,14 @@
 import csv
 import json
 import numpy as np
+import pymongo
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
 
 #Connection to MongoDB with specified Collection
 client = MongoClient('localhost', 27017)
 db = client['test_database']
-collection = 'TestSamplingRatesGlass-2017.10.22-19.00.32'
+collection = 'NIRANJANPICKINGHOME2-2017.10.24-20.37.16'
 
 # Client Timestamp Variables
 timeold_client_phone_accelerometer = 0
@@ -94,10 +95,73 @@ coll_eval_difference_glass_accelerometer = []
 coll_eval_difference_glass_gyroscope = []
 coll_eval_difference_glass_magnetic = []
 
+all_dicts = []
 # Analyze Timestamps
 for x in db[collection].find():
-    dict = json.loads(''.join(map(str, x['session'])))
-    
+    all_dicts.append(json.loads(''.join(map(str, x['session']))))
+
+newlist = sorted(all_dicts, key=lambda k: k['clienttime']) 
+
+for dict in newlist:
+    #PHONE
+    if dict['sensortype'] == 'accelerometer' and dict['deviceid'] == 'ddd830aa7d688be5':
+        timenew_client_phone_accelerometer = int(float(dict['clienttime']))
+        if timeold_client_phone_accelerometer != 0:
+            coll_eval_client_phone_accelerometer.append(timenew_client_phone_accelerometer - timeold_client_phone_accelerometer)
+        timeold_client_phone_accelerometer = timenew_client_phone_accelerometer
+        
+    elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == 'ddd830aa7d688be5':
+        timenew_client_phone_gyroscope = int(float(dict['clienttime']))
+        if timeold_client_phone_gyroscope != 0:
+            coll_eval_client_phone_gyroscope.append(timenew_client_phone_gyroscope - timeold_client_phone_gyroscope)
+        timeold_client_phone_gyroscope = timenew_client_phone_gyroscope
+        
+    elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == 'ddd830aa7d688be5':
+        timenew_client_phone_magnetic = int(float(dict['clienttime']))
+        if timeold_client_phone_magnetic != 0:
+            coll_eval_client_phone_magnetic.append(timenew_client_phone_magnetic - timeold_client_phone_magnetic)
+        timeold_client_phone_magnetic = timenew_client_phone_magnetic
+
+    #WATCH
+    elif dict['sensortype'] == 'accelerometer' and dict['deviceid'] == 'f7c3857f13a0234f':
+        timenew_client_watch_accelerometer = int(float(dict['clienttime']))
+        if timeold_client_watch_accelerometer != 0:
+            coll_eval_client_watch_accelerometer.append(timenew_client_watch_accelerometer - timeold_client_watch_accelerometer)
+        timeold_client_watch_accelerometer = timenew_client_watch_accelerometer
+
+    elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == 'f7c3857f13a0234f':
+        timenew_client_watch_gyroscope = int(float(dict['clienttime']))
+        if timeold_client_watch_gyroscope != 0:
+            coll_eval_client_watch_gyroscope.append(timenew_client_watch_gyroscope - timeold_client_watch_gyroscope)
+        timeold_client_watch_gyroscope = timenew_client_watch_gyroscope
+        
+    elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == 'f7c3857f13a0234f':
+        timenew_client_watch_magnetic = int(float(dict['clienttime']))
+        if timeold_client_watch_magnetic != 0:
+            coll_eval_client_watch_magnetic.append(timenew_client_watch_magnetic - timeold_client_watch_magnetic)
+        timeold_client_watch_magnetic = timenew_client_watch_magnetic
+
+    #GLASS
+    elif dict['sensortype'] == 'accelerometer' and dict['deviceid'] == '62c7c4a8aa33b123':
+        timenew_client_glass_accelerometer = int(float(dict['clienttime']))
+        if timeold_client_glass_accelerometer != 0:
+            coll_eval_client_glass_accelerometer.append(timenew_client_glass_accelerometer - timeold_client_glass_accelerometer)
+        timeold_client_glass_accelerometer = timenew_client_glass_accelerometer
+
+    elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == '62c7c4a8aa33b123':
+        timenew_client_glass_gyroscope = int(float(dict['clienttime']))
+        if timeold_client_glass_gyroscope != 0:
+            coll_eval_client_glass_gyroscope.append(timenew_client_glass_gyroscope - timeold_client_glass_gyroscope)
+        timeold_client_glass_gyroscope = timenew_client_glass_gyroscope
+
+    elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == '62c7c4a8aa33b123':
+
+        timenew_client_glass_magnetic = int(float(dict['clienttime']))
+        if timeold_client_glass_magnetic != 0:
+            coll_eval_client_glass_magnetic.append(timenew_client_glass_magnetic - timeold_client_glass_magnetic)
+        timeold_client_glass_magnetic = timenew_client_glass_magnetic
+
+for dict in all_dicts:
     #PHONE
     if dict['sensortype'] == 'accelerometer' and dict['deviceid'] == 'ddd830aa7d688be5':
         timenew_server_phone_accelerometer = int(float(dict['servertime']))
@@ -105,11 +169,7 @@ for x in db[collection].find():
             coll_eval_server_phone_accelerometer.append(timenew_server_phone_accelerometer - timeold_server_phone_accelerometer)
             coll_eval_difference_phone_accelerometer.append(timeold_server_phone_accelerometer-timeold_client_phone_accelerometer)
         timeold_server_phone_accelerometer = timenew_server_phone_accelerometer
-
-        timenew_client_phone_accelerometer = int(float(dict['clienttime']))
-        if timeold_client_phone_accelerometer != 0:
-            coll_eval_client_phone_accelerometer.append(timenew_client_phone_accelerometer - timeold_client_phone_accelerometer)
-        timeold_client_phone_accelerometer = timenew_client_phone_accelerometer
+        timeold_client_phone_accelerometer = int(float(dict['clienttime']))
         
     elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == 'ddd830aa7d688be5':
         timenew_server_phone_gyroscope = int(float(dict['servertime']))
@@ -117,23 +177,15 @@ for x in db[collection].find():
             coll_eval_server_phone_gyroscope.append(timenew_server_phone_gyroscope - timeold_server_phone_gyroscope)
             coll_eval_difference_phone_gyroscope.append(timeold_server_phone_gyroscope-timeold_client_phone_gyroscope)
         timeold_server_phone_gyroscope = timenew_server_phone_gyroscope
-
-        timenew_client_phone_gyroscope = int(float(dict['clienttime']))
-        if timeold_client_phone_gyroscope != 0:
-            coll_eval_client_phone_gyroscope.append(timenew_client_phone_gyroscope - timeold_client_phone_gyroscope)
-        timeold_client_phone_gyroscope = timenew_client_phone_gyroscope
-        
+        timeold_client_phone_gyroscope = int(float(dict['clienttime']))
+    
     elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == 'ddd830aa7d688be5':
         timenew_server_phone_magnetic = int(float(dict['servertime']))
         if timeold_server_phone_magnetic != 0 and (timenew_server_phone_magnetic - timeold_server_phone_magnetic) != 0:
             coll_eval_server_phone_magnetic.append(timenew_server_phone_magnetic - timeold_server_phone_magnetic)
             coll_eval_difference_phone_magnetic.append(timeold_server_phone_magnetic-timeold_client_phone_magnetic)
         timeold_server_phone_magnetic = timenew_server_phone_magnetic
-
-        timenew_client_phone_magnetic = int(float(dict['clienttime']))
-        if timeold_client_phone_magnetic != 0:
-            coll_eval_client_phone_magnetic.append(timenew_client_phone_magnetic - timeold_client_phone_magnetic)
-        timeold_client_phone_magnetic = timenew_client_phone_magnetic
+        timeold_client_phone_magnetic = int(float(dict['clienttime']))
 
     #WATCH
     elif dict['sensortype'] == 'accelerometer' and dict['deviceid'] == 'f7c3857f13a0234f':
@@ -142,11 +194,7 @@ for x in db[collection].find():
             coll_eval_server_watch_accelerometer.append(timenew_server_watch_accelerometer - timeold_server_watch_accelerometer)
             coll_eval_difference_watch_accelerometer.append(timeold_server_watch_accelerometer-timeold_client_watch_accelerometer)
         timeold_server_watch_accelerometer = timenew_server_watch_accelerometer
-
-        timenew_client_watch_accelerometer = int(float(dict['clienttime']))
-        if timeold_client_watch_accelerometer != 0:
-            coll_eval_client_watch_accelerometer.append(timenew_client_watch_accelerometer - timeold_client_watch_accelerometer)
-        timeold_client_watch_accelerometer = timenew_client_watch_accelerometer
+        timeold_client_watch_accelerometer = int(float(dict['clienttime']))
 
     elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == 'f7c3857f13a0234f':
         timenew_server_watch_gyroscope = int(float(dict['servertime']))
@@ -154,23 +202,15 @@ for x in db[collection].find():
             coll_eval_server_watch_gyroscope.append(timenew_server_watch_gyroscope - timeold_server_watch_gyroscope)
             coll_eval_difference_watch_gyroscope.append(timeold_server_watch_gyroscope-timeold_client_watch_gyroscope)
         timeold_server_watch_gyroscope = timenew_server_watch_gyroscope
-
-        timenew_client_watch_gyroscope = int(float(dict['clienttime']))
-        if timeold_client_watch_gyroscope != 0:
-            coll_eval_client_watch_gyroscope.append(timenew_client_watch_gyroscope - timeold_client_watch_gyroscope)
-        timeold_client_watch_gyroscope = timenew_client_watch_gyroscope
-        
+        timeold_client_watch_gyroscope = int(float(dict['clienttime']))
+   
     elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == 'f7c3857f13a0234f':
         timenew_server_watch_magnetic = int(float(dict['servertime']))
         if timeold_server_watch_magnetic != 0 and (timenew_server_watch_magnetic - timeold_server_watch_magnetic) != 0:
             coll_eval_server_watch_magnetic.append(timenew_server_watch_magnetic - timeold_server_watch_magnetic)
             coll_eval_difference_watch_magnetic.append(timeold_server_watch_magnetic-timeold_client_watch_magnetic)
         timeold_server_watch_magnetic = timenew_server_watch_magnetic
-
-        timenew_client_watch_magnetic = int(float(dict['clienttime']))
-        if timeold_client_watch_magnetic != 0:
-            coll_eval_client_watch_magnetic.append(timenew_client_watch_magnetic - timeold_client_watch_magnetic)
-        timeold_client_watch_magnetic = timenew_client_watch_magnetic
+        timeold_client_watch_magnetic = int(float(dict['clienttime']))
 
     #GLASS
     elif dict['sensortype'] == 'accelerometer' and dict['deviceid'] == '62c7c4a8aa33b123':
@@ -179,11 +219,7 @@ for x in db[collection].find():
             coll_eval_server_glass_accelerometer.append(timenew_server_glass_accelerometer - timeold_server_glass_accelerometer)
             coll_eval_difference_glass_accelerometer.append(timeold_server_glass_accelerometer-timeold_client_glass_accelerometer)
         timeold_server_glass_accelerometer = timenew_server_glass_accelerometer
-
-        timenew_client_glass_accelerometer = int(float(dict['clienttime']))
-        if timeold_client_glass_accelerometer != 0:
-            coll_eval_client_glass_accelerometer.append(timenew_client_glass_accelerometer - timeold_client_glass_accelerometer)
-        timeold_client_glass_accelerometer = timenew_client_glass_accelerometer
+        timeold_client_glass_accelerometer = int(float(dict['clienttime']))
 
     elif dict['sensortype'] == 'gyroscope' and dict['deviceid'] == '62c7c4a8aa33b123':
         timenew_server_glass_gyroscope = int(float(dict['servertime']))
@@ -191,11 +227,7 @@ for x in db[collection].find():
             coll_eval_server_glass_gyroscope.append(timenew_server_glass_gyroscope - timeold_server_glass_gyroscope)
             coll_eval_difference_glass_gyroscope.append(timeold_server_glass_gyroscope-timeold_client_glass_gyroscope)
         timeold_server_glass_gyroscope = timenew_server_glass_gyroscope
-
-        timenew_client_glass_gyroscope = int(float(dict['clienttime']))
-        if timeold_client_glass_gyroscope != 0:
-            coll_eval_client_glass_gyroscope.append(timenew_client_glass_gyroscope - timeold_client_glass_gyroscope)
-        timeold_client_glass_gyroscope = timenew_client_glass_gyroscope
+        timeold_client_glass_gyroscope = int(float(dict['clienttime']))
 
     elif dict['sensortype'] == 'magneticfield' and dict['deviceid'] == '62c7c4a8aa33b123':
         timenew_server_glass_magnetic = int(float(dict['servertime']))
@@ -203,11 +235,7 @@ for x in db[collection].find():
             coll_eval_server_glass_magnetic.append(timenew_server_glass_magnetic - timeold_server_glass_magnetic)
             coll_eval_difference_glass_magnetic.append(timeold_server_glass_magnetic-timeold_client_glass_magnetic)
         timeold_server_glass_magnetic = timenew_server_glass_magnetic
-
         timenew_client_glass_magnetic = int(float(dict['clienttime']))
-        if timeold_client_glass_magnetic != 0:
-            coll_eval_client_glass_magnetic.append(timenew_client_glass_magnetic - timeold_client_glass_magnetic)
-        timeold_client_glass_magnetic = timenew_client_glass_magnetic
 
 # Delete last Server Timestamp Difference due to buffer flush in the end
 if (len(coll_eval_server_phone_accelerometer) != 0): del coll_eval_server_phone_accelerometer[-1]
@@ -238,36 +266,42 @@ plt.plot(coll_eval_client_phone_accelerometer)
 plt.ylabel('timedifference in ms')
 plt.title('Client Phone Accelerometer')
 plt.savefig('Images/Client_Phone_Accelerometer.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_phone_gyroscope)
 plt.ylabel('timedifference in ms')
 plt.title('Client Phone Gyroscope')
 plt.savefig('Images/Client_Phone_Gyroscope.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_phone_magnetic)
 plt.ylabel('timedifference in ms')
 plt.title('Client Phone MagneticField')
 plt.savefig('Images/Client_Phone_MagneticField.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_watch_accelerometer)
 plt.ylabel('timedifference in ms')
 plt.title('Client Watch Accelerometer')
 plt.savefig('Images/Client_Watch_Accelerometer.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_watch_gyroscope)
 plt.ylabel('timedifference in ms')
 plt.title('Client Watch Gyroscope')
 plt.savefig('Images/Client_Watch_Gyroscope.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_watch_magnetic)
 plt.ylabel('timedifference in ms')
 plt.title('Client Watch MagneticField')
 plt.savefig('Images/Client_Watch_MagneticField.png')
+plt.show()
 plt.clf()
 
 plt.plot(coll_eval_client_glass_accelerometer)
